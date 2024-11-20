@@ -110,13 +110,3 @@ def write_graph_to_file(matrix: list[list[int]], filename: str, is_directed: boo
     # print(loaded_matrix)
     # write_graph_to_file(read_graph("graph.csv", is_directed=False), 'new_file.csv',True)
 
-def shortest_path(graph: tuple[dict, list], start: dict, end: dict) -> list[tuple]:
-    pass
-
-
-def load_into_truck(items: list[dict[str, tuple]]) -> list[tuple]:
-    pass
-
-
-def get_directions(path: list[tuple]) -> list[str]:
-    pass
