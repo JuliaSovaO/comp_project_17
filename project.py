@@ -131,9 +131,9 @@ def write_graph_to_file(
 # write_graph_to_file(read_graph("graph.csv", is_directed=False), 'new_file.csv',True)
 
 
-def find_connectivity(graph: list[list[int]]) -> list[list[int]]:
+def find_connectivity(graph: list[list[int]]) -> list[list[int]]: #Sofiia Sychak
     """
-    Finds all connected components in an undirected graph.
+    Finds all connected components in an undirected and a directed(weak connectivity) graph.
 
     Args:
         matrix (list[list[int]]): Adjacency matrix of the graph.
@@ -148,7 +148,80 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:
     >>> find_connectivity(matrix)
     [[0, 1], [2, 3]]
     """
-    pass
+
+    def is_directed_graph(graph: list[list[int]]) -> bool:
+        """
+        Checks if the graph is directed.
+        
+        Args:
+            matrix (list[list[int]]): Adjacency matrix of the graph.
+        Returns:
+            True or False: bool dtatement that represent whether the graph is directed.
+        >>> matrix = [
+    [0, 1, 0, 1],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+    [0, 0, 0, 0]
+]
+        >>> is_directed_graph(matrix)
+        True
+        """
+        for i, row in enumerate(graph):
+            for j, value in enumerate(row):
+                if value != graph[j][i]:
+                    return True
+        return False
+
+    def make_undirected(graph):
+        """
+        Converts a directed graph into an undirected one for weak connectivity.
+
+        Args:
+            matrix (list[list[int]]): Adjacency matrix of the graph.
+        Returns: 
+            matrix (list[list[int]]): Renewed the graph that is undirectted now.
+        >>> matrix = [
+    [0, 1, 0, 1],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+    [0, 0, 0, 0]
+]
+        >>> make_undirected(matrix)
+        [
+    [0, 1, 0, 1],
+    [1, 0, 1, 0],
+    [0, 1, 0, 1],
+    [1, 0, 1, 0]
+]
+        """
+        for i, row in enumerate(graph):
+            for j, value in enumerate(row):
+                if value == 1 or graph[j][i] == 1:
+                    graph[i][j] = graph[j][i] = 1
+        return graph
+
+
+    visited = [False] * len(graph)
+    components = []
+
+    def dfs(node, component):
+        visited[node] = True
+        component.append(node)
+        for neighbor, connected in enumerate(graph[node]):
+            if connected == 1 and not visited[neighbor]:
+                dfs(neighbor, component)
+
+    for i in range(len(graph)):
+        if not visited[i]:
+            component = []
+            dfs(i, component)
+            components.append(component)
+
+
+    if is_directed_graph(graph):
+        graph = make_undirected(graph)
+
+    return components
 
 
 def find_strong_connectivity(graph: list[list[int]]) -> list[list[int]]:
