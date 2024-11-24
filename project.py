@@ -228,6 +228,39 @@ def find_strong_connectivity(graph: list[list[int]]) -> list[list[int]]:
     pass
 
 
+def deep_first_search(graph: list[list[int]], strating_point: int) -> list:
+    """
+    Function that implements depth-first search (DFS).
+
+    :param graph: list[list[int]], adjacency matrix of the graph
+    :param starting_point: int, The point to statr the search with
+    :return: list of visited nodes
+
+    >>> matrix = [
+    ...     [0, 1, 1, 1, 0],
+    ...     [1, 0, 1, 0, 0],
+    ...     [1, 1, 0, 0, 1],
+    ...     [1, 0, 0, 0, 0],
+    ...     [0, 0, 1, 0, 0]
+    ... ]
+    >>> deep_first_search(matrix, 0)
+    [0, 1, 2, 4, 3]
+"""
+    visited = []
+    stack = [strating_point]
+
+    while stack:
+        temp_stack = []
+        node = stack.pop()
+        if node not in visited:
+            visited.append(node)
+            for neighbor, is_connected in enumerate(graph[node]):
+                if is_connected and neighbor not in visited:
+                    temp_stack.append(neighbor)
+            stack.extend(list(reversed(temp_stack)))
+    return visited
+
+
 def find_connection_points(graph: list[list[int]]) -> list:
     pass
 
