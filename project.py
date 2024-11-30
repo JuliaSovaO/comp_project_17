@@ -106,7 +106,8 @@ def write_graph_to_file(
     1,4\n\
     2,3\n\
     3,3\n\
-    3,4
+    3,4\n\
+    <BLANKLINE>
     """
     with open(filename, "w", encoding="utf-8") as file:
         n = len(matrix)
@@ -132,7 +133,7 @@ def write_graph_to_file(
 # write_graph_to_file(read_graph("graph.csv", is_directed=False), 'new_file.csv',True)
 
 
-def find_connectivity(graph: list[list[int]]) -> list[list[int]]: #Sofiia Sychak
+def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sychak
     """
     Finds all connected components in an undirected and a directed(weak connectivity) graph.
 
@@ -153,17 +154,17 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]: #Sofiia Sychak
     def is_directed_graph(graph: list[list[int]]) -> bool:
         """
         Checks if the graph is directed.
-        
+
         Args:
             matrix (list[list[int]]): Adjacency matrix of the graph.
         Returns:
             True or False: bool dtatement that represent whether the graph is directed.
         >>> matrix = [
-    [0, 1, 0, 1],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-    [0, 0, 0, 0]
-]
+        [0, 1, 0, 1],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+        [0, 0, 0, 0]
+        ]
         >>> is_directed_graph(matrix)
         True
         """
@@ -179,28 +180,27 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]: #Sofiia Sychak
 
         Args:
             matrix (list[list[int]]): Adjacency matrix of the graph.
-        Returns: 
+        Returns:
             matrix (list[list[int]]): Renewed the graph that is undirectted now.
         >>> matrix = [
-    [0, 1, 0, 1],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-    [0, 0, 0, 0]
-]
-        >>> make_undirected(matrix)
-        [
-    [0, 1, 0, 1],
-    [1, 0, 1, 0],
-    [0, 1, 0, 1],
-    [1, 0, 1, 0]
-]
+        [0, 1, 0, 1],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+        [0, 0, 0, 0]
+        ]
+            >>> make_undirected(matrix)
+            [
+        [0, 1, 0, 1],
+        [1, 0, 1, 0],
+        [0, 1, 0, 1],
+        [1, 0, 1, 0]
+        ]
         """
         for i, row in enumerate(graph):
             for j, value in enumerate(row):
                 if value == 1 or graph[j][i] == 1:
                     graph[i][j] = graph[j][i] = 1
         return graph
-
 
     visited = [False] * len(graph)
     components = []
@@ -217,7 +217,6 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]: #Sofiia Sychak
             component = []
             dfs(i, component)
             components.append(component)
-
 
     if is_directed_graph(graph):
         graph = make_undirected(graph)
@@ -320,17 +319,25 @@ def find_bridges(graph: list[list[int]]) -> list:
         tuple of two integers (the endpoints of the edge).
 
     Examples:
-    >>> matrix = [[0, 1, 0, 0, 0], [1, 0, 1, 1, 0], [0, 1, 0, 0, 0], [0, 1, 0, 0, 1], \
+    >>> matrix1 = [[0, 1, 0, 0, 0], [1, 0, 1, 1, 0], [0, 1, 0, 0, 0], [0, 1, 0, 0, 1], \
 [0, 0, 0, 1, 0]]
-    >>> find_bridges(matrix)
-    [(1, 2), (3, 4)]
-    >>> matrix = [[0, 1, 0, 0, 1], [1, 0, 1, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], \
+    >>> find_bridges(matrix1)
+    [(1, 2), (2, 3), (2, 4), (4, 5)]
+    >>> matrix2 = [[0, 1, 1, 0, 0], [1, 0, 1, 0, 0], [1, 1, 0, 1, 0], [0, 0, 1, 0, 1], \
+[0, 0, 0, 1, 0]]
+    >>> find_bridges(matrix2)
+    [(3, 4), (4, 5)]
+    >>> matrix3 = [[0, 1, 1, 0, 0, 0], [1, 0, 1, 0, 0, 0], [1, 1, 0, 1, 0, 0], [0, 0, 1, 0, 1, 1], \
+[0, 0, 0, 1, 0, 1], [0, 0, 0, 1, 1, 0]]
+    >>> find_bridges(matrix3)
+    [(3, 4)]
+    >>> matrix4 = [[0, 1, 0, 0, 1], [1, 0, 1, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], \
 [1, 0, 0, 1, 0]]
-    >>> find_bridges(matrix)
+    >>> find_bridges(matrix4)
     []
-    >>> matrix = [[0, 1, 0], [1, 0, 1], [0, 1, 0],]
-    >>> find_bridges(matrix)
-    [(0, 1), (1, 2)]
+    >>> matrix5 = [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
+    >>> find_bridges(matrix5)
+    [(1, 2), (2, 3)]
     """
     bridges = []
     initial_components = find_connectivity(graph)
@@ -342,7 +349,7 @@ def find_bridges(graph: list[list[int]]) -> list:
                 graph[i][j], graph[j][i] = 0, 0
                 new_components = find_connectivity(graph)
                 if len(new_components) > len(initial_components):
-                    bridges.append((i, j))
+                    bridges.append((i + 1, j + 1))
                 graph[i][j], graph[j][i] = 1, 1
 
     return bridges
