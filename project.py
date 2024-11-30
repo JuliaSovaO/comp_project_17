@@ -1,28 +1,4 @@
-"""
-Для файлу з вмістом:
-        1,2
-        2,3
-        3,4
-        1,4
-    функція read_graph_from_file виведе наступне:
-
-Для орієнтованого графу:
-[
-    [0, 1, 0, 1],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1],
-    [0, 0, 0, 0]
-]
-
-Для неорієнтованого графу:
-[
-    [0, 1, 0, 1],
-    [1, 0, 1, 0],
-    [0, 1, 0, 1],
-    [1, 0, 1, 0]
-]
-"""
-
+'''A Python library for analyzing graph structures'''
 import copy
 
 def read_graph(filename: str, is_directed: bool = False) -> list[list[int]]:
@@ -127,12 +103,6 @@ def write_graph_to_file(
                             written_edges.add(edge)
 
 
-# if __name__ == "__main__":
-# loaded_matrix = read_graph("graph.csv", is_directed=False)
-# print(loaded_matrix)
-# write_graph_to_file(read_graph("graph.csv", is_directed=False), 'new_file.csv',True)
-
-
 def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sychak
     """
     Finds all connected components in an undirected and a directed(weak connectivity) graph.
@@ -188,7 +158,7 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
         [0, 0, 0, 1],
         [0, 0, 0, 0]
         ]
-            >>> make_undirected(matrix)
+        >>> make_undirected(matrix)
             [
         [0, 1, 0, 1],
         [1, 0, 1, 0],
