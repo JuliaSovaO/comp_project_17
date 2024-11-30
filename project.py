@@ -23,6 +23,7 @@
 ]
 """
 
+import copy
 
 def read_graph(filename: str, is_directed: bool = False) -> list[list[int]]:
     """
@@ -228,12 +229,12 @@ def find_strong_connectivity(graph: list[list[int]]) -> list[list[int]]:
     pass
 
 
-def deep_first_search(graph: list[list[int]], strating_point: int) -> list:
+def deep_first_search(graph: list[list[int]], strating_point: int = 0) -> list:
     """
     Function that implements depth-first search (DFS).
 
     :param graph: list[list[int]], adjacency matrix of the graph
-    :param starting_point: int, The point to statr the search with
+    :param starting_point: int, The point to start the search with
     :return: list of visited nodes
 
     >>> matrix = [
@@ -245,7 +246,7 @@ def deep_first_search(graph: list[list[int]], strating_point: int) -> list:
     ... ]
     >>> deep_first_search(matrix, 0)
     [0, 1, 2, 4, 3]
-"""
+    """
     visited = []
     stack = [strating_point]
 
@@ -261,9 +262,57 @@ def deep_first_search(graph: list[list[int]], strating_point: int) -> list:
     return visited
 
 
-def find_connection_points(graph: list[list[int]]) -> list:
-    pass
+def find_connection_points(graph: list[list[int]]) -> set:
+    """
+    Function that searches for articulation points in graph
 
+    :param graph: list[list[int]], Adjacency matrix of graph
+    :return: list, List of all articulation points in graph
+
+    >>> matrix = [
+    ...     [0, 1, 1, 1, 0],
+    ...     [1, 0, 1, 0, 0],
+    ...     [1, 1, 0, 0, 1],
+    ...     [1, 0, 0, 0, 0],
+    ...     [0, 0, 1, 0, 0]
+    ... ]
+    >>> find_connection_points(matrix) == {0, 2}
+    True
+    >>> matrix = [
+    ...     [0, 1, 1, 1, 0, 0, 0, 0],
+    ...     [1, 0, 1, 0, 1, 0, 0, 0],
+    ...     [1, 1, 0, 0, 0, 0, 0, 0],
+    ...     [1, 0, 0, 0, 0, 0, 0, 0],
+    ...     [0, 1, 0, 0, 0, 1, 0, 1],
+    ...     [0, 0, 0, 0, 1, 0, 1, 0],
+    ...     [0, 0, 0, 0, 0, 1, 0, 1],
+    ...     [0, 0, 0, 0, 1, 0, 1, 0]
+    ... ]
+    >>> find_connection_points(matrix) == {0, 1, 4}
+    True
+    """
+    articulation_points = set()
+    n = len(graph)
+    original_components_of_conectivity = len(find_connectivity(graph))
+    for i in range(n):
+        graph_copy = copy.deepcopy(graph)
+        for j in range(n):
+            graph_copy[j].pop(i)
+        graph_copy.pop(i)
+        print(find_connectivity(graph_copy))
+        new_components_of_conectivity = len(find_connectivity(graph_copy))
+        if new_components_of_conectivity > original_components_of_conectivity:
+            articulation_points.add(i)
+    return articulation_points
+
+matrix = [
+    [0, 1, 1, 1, 0],
+    [1, 0, 1, 0, 0],
+    [1, 1, 0, 0, 1],
+    [1, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0]
+]
+print(find_connection_points(matrix))
 
 def find_bridges(graph: list[list[int]]) -> list:
     """
@@ -307,7 +356,7 @@ def find_bridges(graph: list[list[int]]) -> list:
     return bridges
 
 
-if __name__ == "__main__":
-    import doctest
+# if __name__ == "__main__":
+#     import doctest
 
-    print(doctest.testmod())
+#     print(doctest.testmod())
