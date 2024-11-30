@@ -305,14 +305,6 @@ def find_connection_points(graph: list[list[int]]) -> set:
             articulation_points.add(i)
     return articulation_points
 
-matrix = [
-    [0, 1, 1, 1, 0],
-    [1, 0, 1, 0, 0],
-    [1, 1, 0, 0, 1],
-    [1, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0]
-]
-print(find_connection_points(matrix))
 
 def find_bridges(graph: list[list[int]]) -> list:
     """
@@ -356,7 +348,6 @@ def find_bridges(graph: list[list[int]]) -> list:
     return bridges
 
 
-# if __name__ == "__main__":
-#     import doctest
-
-#     print(doctest.testmod())
+if __name__ == "__main__":
+    import doctest
+    print(doctest.testmod())
