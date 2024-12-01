@@ -1,5 +1,6 @@
 '''A Python library for analyzing graph structures'''
 import copy
+import time
 
 def read_graph(filename: str, is_directed: bool = False) -> list[list[int]]:
     """
@@ -418,6 +419,33 @@ def find_connection_points_optimized(graph: list[list[int]]) -> set:
                 articulation_points.add(i)
                 break
     return articulation_points
+
+
+def find_function_runtime(func, graph: list[list[int]]) -> float:
+    """
+    Returns the runtime of the function
+
+    :param func: callable, The function to check
+    :param graph: list, The graph that function will work with
+    :return: float, The runtime of the function
+
+    Example of matrix to test functions on:
+    matrix = [
+        [0, 1, 1, 1, 0, 0, 0, 0],
+        [1, 0, 1, 0, 1, 0, 0, 0],
+        [1, 1, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 1, 0, 1, 0]
+    ]
+    """
+    begin = time.time()
+    func(graph)
+    time.sleep(1)
+    end = time.time()
+    return end-begin
 
 
 def find_bridges(graph: list[list[int]]) -> list:
