@@ -1,6 +1,9 @@
-'''A Python library for analyzing graph structures'''
+"""A Python library for analyzing graph structures"""
+
 import copy
 import time
+import argparse
+
 
 def read_graph(filename: str, is_directed: bool = False) -> list[list[int]]:
     """
@@ -200,7 +203,7 @@ def transp_graph(graph):
     Створює транспонований граф (змінює напрямки всіх ребер)
     :param graph: граф
     :return: транспонований граф
-    >>> transpose_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
+    >>> transp_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
 [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
     [[0, 0, 1, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]]
     """
@@ -238,7 +241,7 @@ def find_strong_connectivity_kosaraju(graph):
     Повертає список компонент, де кожна компонента - це список вершин
     :param graph: граф у вигялді матриці
     :return: список компонент сильної зв'язності
-    >>> find_strong_connectivity([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], \
+    >>> find_strong_connectivity_kosaraju([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], \
 [1, 0, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
     [[0, 1, 2], [3, 4]]
     """
@@ -260,7 +263,6 @@ def find_strong_connectivity_kosaraju(graph):
             dfs_kosaraju(transp, vert, visited, curr_comp)
             comps.append(sorted(curr_comp))
     return sorted(comps)
-
 
 
 def deep_first_search(graph: list[list[int]], strating_point: int = 0) -> list:
@@ -338,6 +340,7 @@ def find_connection_points(graph: list[list[int]]) -> set:
             articulation_points.add(i)
     return articulation_points
 
+
 def find_connection_points_optimized(graph: list[list[int]]) -> set:
     """
     Function that searches for articulation points in graph
@@ -373,8 +376,8 @@ def find_connection_points_optimized(graph: list[list[int]]) -> set:
     current_node = starting_node
     stack = []
     number = 1
-    order_of_nodes = [0]*n
-    lows = [n]*n
+    order_of_nodes = [0] * n
+    lows = [n] * n
     stack.append(current_node)
     order_of_nodes[current_node] = number
     number += 1
@@ -445,7 +448,7 @@ def find_function_runtime(func, graph: list[list[int]]) -> float:
     func(graph)
     time.sleep(1)
     end = time.time()
-    return end-begin
+    return end - begin
 
 
 def find_bridges(graph: list[list[int]]) -> list:
@@ -498,6 +501,98 @@ def find_bridges(graph: list[list[int]]) -> list:
     return bridges
 
 
+def argprs():
+    """
+    Parse command-line arguments for the graph analysis library.
+
+    return: argparse.Namespace, Parsed arguments object.
+    """
+    parser = argparse.ArgumentParser(
+        prog="A Python library for analyzing graph structures",
+        description="Library for graph connectivity analysis",
+    )
+
+    parser.add_argument(
+        "-i",
+        "--input",
+        required=True,
+        help="Path to the input file containing the graph (csv).",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Path to the output file for saving results (csv).",
+    )
+
+    parser.add_argument(
+        "-t",
+        "--task",
+        required=True,
+        choices=[
+            "read",
+            "write",
+            "components",
+            "strong_components",
+            "connection_points",
+            "bridges",
+        ],
+        help="The task to perform on the graph.",
+    )
+
+    parser.add_argument(
+        "-d",
+        "--directed",
+        action="store_true",
+        help="Specify if the graph is directed (default is undirected).",
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    """
+    Control the execution of functions using argparse and output result.
+    """
+    args = argprs()
+
+    if args.task != "read":
+        graph = read_graph(args.input)
+    else:
+        graph = None
+
+    if args.task == "read":
+        print(f"Reading graph from {args.input}...")
+        graph = read_graph(args.input)
+        print(graph)
+
+    elif args.task == "write":
+        print(f"Writing graph to {args.output}...")
+        write_graph_to_file(graph, args.output)
+
+    elif args.task == "components":
+        print("Finding connectivity components...")
+        components = find_connectivity(graph)
+        print("Connectivity components:", components)
+
+    elif args.task == "strong_components":
+        print("Finding components of strong connectivity...")
+        st_components = find_strong_connectivity_kosaraju(graph)
+        print("Components of strong connectivity:", st_components)
+
+    elif args.task == "connection_points":
+        print("Finding connection points...")
+        con_points = find_connection_points(graph)
+        print("Connection points:", con_points)
+
+    elif args.task == "bridges":
+        print("Finding bridges...")
+        bridges = find_bridges(graph)
+        print("Bridges:", bridges)
+
+
 if __name__ == "__main__":
-    import doctest
-    print(doctest.testmod())
+    # import doctest
+
+    # print(doctest.testmod())
+    main()
