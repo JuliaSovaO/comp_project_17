@@ -332,10 +332,91 @@ def find_connection_points(graph: list[list[int]]) -> set:
         for j in range(n):
             graph_copy[j].pop(i)
         graph_copy.pop(i)
-        print(find_connectivity(graph_copy))
         new_components_of_conectivity = len(find_connectivity(graph_copy))
         if new_components_of_conectivity > original_components_of_conectivity:
             articulation_points.add(i)
+    return articulation_points
+
+def find_connection_points_optimized(graph: list[list[int]]) -> set:
+    """
+    Function that searches for articulation points in graph
+
+    :param graph: list[list[int]], Adjacency matrix of graph
+    :return: list, List of all articulation points in graph
+
+    >>> matrix = [
+    ...     [0, 1, 1, 1, 0],
+    ...     [1, 0, 1, 0, 0],
+    ...     [1, 1, 0, 0, 1],
+    ...     [1, 0, 0, 0, 0],
+    ...     [0, 0, 1, 0, 0]
+    ... ]
+    >>> find_connection_points_optimized(matrix) == {0, 2}
+    True
+    >>> matrix = [
+    ...     [0, 1, 1, 1, 0, 0, 0, 0],
+    ...     [1, 0, 1, 0, 1, 0, 0, 0],
+    ...     [1, 1, 0, 0, 0, 0, 0, 0],
+    ...     [1, 0, 0, 0, 0, 0, 0, 0],
+    ...     [0, 1, 0, 0, 0, 1, 0, 1],
+    ...     [0, 0, 0, 0, 1, 0, 1, 0],
+    ...     [0, 0, 0, 0, 0, 1, 0, 1],
+    ...     [0, 0, 0, 0, 1, 0, 1, 0]
+    ... ]
+    >>> find_connection_points_optimized(matrix) == {0, 1, 4}
+    True
+    """
+    starting_node = 0
+    articulation_points = set()
+    n = len(graph)
+    current_node = starting_node
+    stack = []
+    number = 1
+    order_of_nodes = [0]*n
+    lows = [n]*n
+    stack.append(current_node)
+    order_of_nodes[current_node] = number
+    number += 1
+    while stack:
+        neighbor = -1
+        for i in range(n):
+            if i == current_node:
+                continue
+            if graph[current_node][i] == 0:
+                continue
+            if order_of_nodes[i] != 0:
+                if lows[current_node] > order_of_nodes[i]:
+                    lows[current_node] = order_of_nodes[i]
+                continue
+            else:
+                neighbor = i
+                break
+        if neighbor == -1:
+            current_low = lows[current_node]
+            if len(stack) == 1:
+                current_node = stack.pop()
+                break
+            else:
+                stack.pop()
+                current_node = stack[-1]
+            if lows[current_node] > current_low:
+                lows[current_node] = current_low
+            continue
+        current_node = neighbor
+        order_of_nodes[current_node] = number
+        number += 1
+        stack.append(current_node)
+    number_of_children_of_starting_node = 0
+    for j in graph[starting_node]:
+        if j != 0:
+            number_of_children_of_starting_node += 1
+    if number_of_children_of_starting_node > 1:
+        articulation_points.add(starting_node)
+    for i in range(n):
+        for j in range(n):
+            if graph[i][j] and lows[j] == order_of_nodes[i]:
+                articulation_points.add(i)
+                break
     return articulation_points
 
 
