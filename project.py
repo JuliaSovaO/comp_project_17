@@ -194,8 +194,72 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
     return components
 
 
-def find_strong_connectivity(graph: list[list[int]]) -> list[list[int]]:
-    pass
+def transp_graph(graph):
+    """
+    Створює транспонований граф (змінює напрямки всіх ребер)
+    :param graph: граф
+    :return: транспонований граф
+    >>> transpose_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
+[0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
+    [[0, 0, 1, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]]
+    """
+    vertices = len(graph)
+    transp = [[0] * vertices for _ in range(vertices)]
+
+    for num1 in range(vertices):
+        for num2 in range(vertices):
+            if graph[num1][num2]:
+                transp[num2][num1] = 1
+    return transp
+
+
+def dfs_kosaraju(graph, vert, visited, stack):
+    """
+    Перший прохід DFS для алгоритму Косараджу
+    Заповнює стек у порядку завершення обходу
+    :param graph: граф у вигляді матриці
+    :param vert: вершина
+    :param visited: список вершин, які були пройдені
+    :param stack: стек, у який записуються вершини
+    """
+    visited[vert] = True
+
+    for vert1 in range(len(graph)):
+        if graph[vert][vert1] == 1 and visited[vert1] is False:
+            dfs_kosaraju(graph, vert1, visited, stack)
+
+    stack.append(vert)
+
+
+def find_strong_connectivity_kosaraju(graph):
+    """
+    Знаходить компоненти сильної зв'язності у графі
+    Повертає список компонент, де кожна компонента - це список вершин
+    :param graph: граф у вигялді матриці
+    :return: список компонент сильної зв'язності
+    >>> find_strong_connectivity([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], \
+[1, 0, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
+    [[0, 1, 2], [3, 4]]
+    """
+    vertices = len(graph)
+    visited = [False] * vertices
+    stack = []
+
+    for vert in range(vertices):
+        if visited[vert] is False:
+            dfs_kosaraju(graph, vert, visited, stack)
+
+    transp = transp_graph(graph)
+    visited = [False] * vertices
+    comps = []
+    while stack:
+        vert = stack.pop()
+        if visited[vert] is False:
+            curr_comp = []
+            dfs_kosaraju(transp, vert, visited, curr_comp)
+            comps.append(sorted(curr_comp))
+    return sorted(comps)
+
 
 
 def deep_first_search(graph: list[list[int]], strating_point: int = 0) -> list:
