@@ -391,8 +391,8 @@ def find_connection_points_optimized(graph: list[list[int]]) -> set:
         current_node = starting_node
         stack = []
         number = 1
-        order_of_nodes = [0]*n
-        lows = [n]*n
+        order_of_nodes = [0] * n
+        lows = [n] * n
         stack.append(current_node)
         order_of_nodes[current_node] = number
         number += 1
@@ -597,7 +597,7 @@ def main():
 
     elif args.task == "connection_points":
         print("Finding connection points...")
-        con_points = find_connection_points(graph)
+        con_points = find_connection_points_optimized(graph)
         print("Connection points:", con_points)
 
     elif args.task == "bridges":
