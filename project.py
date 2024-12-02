@@ -198,43 +198,6 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
     return components
 
 
-def transp_graph(graph):
-    """
-    Створює транспонований граф (змінює напрямки всіх ребер)
-    :param graph: граф
-    :return: транспонований граф
-    >>> transp_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
-[0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
-    [[0, 0, 1, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]]
-    """
-    vertices = len(graph)
-    transp = [[0] * vertices for _ in range(vertices)]
-
-    for num1 in range(vertices):
-        for num2 in range(vertices):
-            if graph[num1][num2]:
-                transp[num2][num1] = 1
-    return transp
-
-
-def dfs_kosaraju(graph, vert, visited, stack):
-    """
-    Перший прохід DFS для алгоритму Косараджу
-    Заповнює стек у порядку завершення обходу
-    :param graph: граф у вигляді матриці
-    :param vert: вершина
-    :param visited: список вершин, які були пройдені
-    :param stack: стек, у який записуються вершини
-    """
-    visited[vert] = True
-
-    for vert1 in range(len(graph)):
-        if graph[vert][vert1] == 1 and visited[vert1] is False:
-            dfs_kosaraju(graph, vert1, visited, stack)
-
-    stack.append(vert)
-
-
 def find_strong_connectivity_kosaraju(graph):
     """
     Знаходить компоненти сильної зв'язності у графі
@@ -245,6 +208,44 @@ def find_strong_connectivity_kosaraju(graph):
 [1, 0, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
     [[0, 1, 2], [3, 4]]
     """
+
+    def transp_graph(graph):
+        """
+        Створює транспонований граф (змінює напрямки всіх ребер)
+        :param graph: граф
+        :return: транспонований граф
+        >>> transp_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
+    [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
+        [[0, 0, 1, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]]
+        """
+        vertices = len(graph)
+        transp = [[0] * vertices for _ in range(vertices)]
+
+        for num1 in range(vertices):
+            for num2 in range(vertices):
+                if graph[num1][num2]:
+                    transp[num2][num1] = 1
+        return transp
+
+
+    def dfs_kosaraju(graph, vert, visited, stack):
+        """
+        Перший прохід DFS для алгоритму Косараджу
+        Заповнює стек у порядку завершення обходу
+        :param graph: граф у вигляді матриці
+        :param vert: вершина
+        :param visited: список вершин, які були пройдені
+        :param stack: стек, у який записуються вершини
+        """
+        visited[vert] = True
+
+        for vert1 in range(len(graph)):
+            if graph[vert][vert1] == 1 and visited[vert1] is False:
+                dfs_kosaraju(graph, vert1, visited, stack)
+
+        stack.append(vert)
+
+
     vertices = len(graph)
     visited = [False] * vertices
     stack = []
