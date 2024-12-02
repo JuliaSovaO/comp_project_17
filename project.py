@@ -28,47 +28,40 @@ def read_graph(filename: str, is_directed: bool = False) -> list[list[int]]:
     [[0, 1, 0, 1], [1, 0, 1, 0], [0, 1, 0, 1], [1, 0, 1, 0]]
     """
     edges = set()
-    try:
-        with open(filename, "r", encoding="utf-8") as file:
-            for line in file:
-                line = line.strip()
-                if not line:
-                    continue
+    vertices = set()
 
-                parts = line.split(",")
-                if len(parts) != 2:
-                    raise ValueError(f"Invalid line format: {line}")
+    with open(filename, "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if not line:
+                continue
 
-                try:
-                    v1, v2 = map(int, parts)
-                except ValueError:
-                    raise ValueError(f"Vertices must be integers: {line}")
+            parts = line.split(",")
+            if len(parts) != 2:
+                raise ValueError(f"Invalid line format: {line}")
 
-                if v1 <= 0 or v2 <= 0:
-                    raise ValueError(f"Vertex numbers must be positive: {line}")
+            v1, v2 = parts[0].strip(), parts[1].strip()
+            edges.add((v1, v2))
+            vertices.add(v1)
+            vertices.add(v2)
 
-                edges.add((v1, v2))
-                max_vertex = max(v1, v2)
+    vertices = sorted(list(vertices))
+    vertex_to_index = {vertex: i for i, vertex in enumerate(vertices)}
+    n = len(vertices)
 
-    except FileNotFoundError:
-        print(f"File {filename} not found")
-        return []
-
-    matrix = [[0 for _ in range(max_vertex)] for _ in range(max_vertex)]
+    matrix = [[0 for _ in range(n)] for _ in range(n)]
 
     for v1, v2 in edges:
-        v1 -= 1
-        v2 -= 1
-        matrix[v1][v2] = 1
+        i = vertex_to_index[v1]
+        j = vertex_to_index[v2]
+        matrix[i][j] = 1
         if not is_directed:
-            matrix[v2][v1] = 1
+            matrix[j][i] = 1
 
     return matrix
 
-
 def write_graph_to_file(
-    matrix: list[list[int]], filename: str, is_directed: bool = False
-):
+    matrix: list[list[int]], filename: str,vertices: list, is_directed: bool = False):
     """
     Writes a graph from matrix to a text file
 
@@ -78,15 +71,16 @@ def write_graph_to_file(
         is_directed: True if the graph is directed, false if undirected
 
     >>> graph = [[0, 1, 1, 1], [0, 0, 1, 0], [0, 1, 1, 1], [0, 0, 1, 0]]
-    >>> write_graph_to_file(graph, "new_graph.csv")
+    >>> vertices = ['a', 'b', 'c', 'd']
+    >>> write_graph_to_file(graph, "new_graph.csv", vertices)
     >>> with open("new_graph.csv", "r", encoding="utf-8") as file:
     ...     print(file.read())
-    1,2\n\
-    1,3\n\
-    1,4\n\
-    2,3\n\
-    3,3\n\
-    3,4\n\
+    a,b\n\
+    a,c\n\
+    a,d\n\
+    b,c\n\
+    c,c\n\
+    c,d\n\
     <BLANKLINE>
     """
     with open(filename, "w", encoding="utf-8") as file:
@@ -95,16 +89,17 @@ def write_graph_to_file(
             for i in range(n):
                 for j in range(n):
                     if matrix[i][j] == 1:
-                        file.write(f"{i+1},{j+1}\n")
+                        file.write(f"{vertices[i]},{vertices[j]}\n")
         else:
             written_edges = set()
             for i in range(n):
                 for j in range(n):
                     if matrix[i][j] == 1:
-                        edge = tuple(sorted([i + 1, j + 1]))
+                        edge = tuple(sorted([vertices[i], vertices[j]]))
                         if edge not in written_edges:
                             file.write(f"{edge[0]},{edge[1]}\n")
                             written_edges.add(edge)
+
 
 
 def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sychak
@@ -179,6 +174,7 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
     visited = [False] * len(graph)
     components = []
 
+
     def dfs(node, component):
         visited[node] = True
         component.append(node)
@@ -198,6 +194,43 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
     return components
 
 
+
+
+def transp_graph(graph):
+    """
+    Створює транспонований граф (змінює напрямки всіх ребер)
+    :param graph: граф
+    :return: транспонований граф
+    >>> transp_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
+[0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
+    [[0, 0, 1, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]]
+    """
+    vertices = len(graph)
+    transp = [[0] * vertices for _ in range(vertices)]
+
+    for num1 in range(vertices):
+        for num2 in range(vertices):
+            if graph[num1][num2]:
+                transp[num2][num1] = 1
+    return transp
+
+def dfs_kosaraju(graph, vert, visited, stack):
+    """
+    Перший прохід DFS для алгоритму Косараджу
+    Заповнює стек у порядку завершення обходу
+    :param graph: граф у вигляді матриці
+    :param vert: вершина
+    :param visited: список вершин, які були пройдені
+    :param stack: стек, у який записуються вершини
+    """
+    visited[vert] = True
+
+    for vert1 in range(len(graph)):
+        if graph[vert][vert1] == 1 and visited[vert1] is False:
+            dfs_kosaraju(graph, vert1, visited, stack)
+
+    stack.append(vert)
+
 def find_strong_connectivity_kosaraju(graph):
     """
     Знаходить компоненти сильної зв'язності у графі
@@ -208,44 +241,6 @@ def find_strong_connectivity_kosaraju(graph):
 [1, 0, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
     [[0, 1, 2], [3, 4]]
     """
-
-    def transp_graph(graph):
-        """
-        Створює транспонований граф (змінює напрямки всіх ребер)
-        :param graph: граф
-        :return: транспонований граф
-        >>> transp_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
-    [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
-        [[0, 0, 1, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]]
-        """
-        vertices = len(graph)
-        transp = [[0] * vertices for _ in range(vertices)]
-
-        for num1 in range(vertices):
-            for num2 in range(vertices):
-                if graph[num1][num2]:
-                    transp[num2][num1] = 1
-        return transp
-
-
-    def dfs_kosaraju(graph, vert, visited, stack):
-        """
-        Перший прохід DFS для алгоритму Косараджу
-        Заповнює стек у порядку завершення обходу
-        :param graph: граф у вигляді матриці
-        :param vert: вершина
-        :param visited: список вершин, які були пройдені
-        :param stack: стек, у який записуються вершини
-        """
-        visited[vert] = True
-
-        for vert1 in range(len(graph)):
-            if graph[vert][vert1] == 1 and visited[vert1] is False:
-                dfs_kosaraju(graph, vert1, visited, stack)
-
-        stack.append(vert)
-
-
     vertices = len(graph)
     visited = [False] * vertices
     stack = []
@@ -264,6 +259,9 @@ def find_strong_connectivity_kosaraju(graph):
             dfs_kosaraju(transp, vert, visited, curr_comp)
             comps.append(sorted(curr_comp))
     return sorted(comps)
+
+
+
 
 
 
@@ -309,7 +307,6 @@ def find_connection_points(graph: list[list[int]]) -> set:
         if new_components_of_conectivity > original_components_of_conectivity:
             articulation_points.add(i)
     return articulation_points
-
 
 def find_connection_points_optimized(graph: list[list[int]]) -> set:
     """
@@ -409,31 +406,6 @@ def find_connection_points_optimized(graph: list[list[int]]) -> set:
     return articulation_points
 
 
-def find_function_runtime(func, graph: list[list[int]]) -> float:
-    """
-    Returns the runtime of the function
-
-    :param func: callable, The function to check
-    :param graph: list, The graph that function will work with
-    :return: float, The runtime of the function
-
-    Example of matrix to test functions on:
-    matrix = [
-        [0, 1, 1, 1, 0, 0, 0, 0],
-        [1, 0, 1, 0, 1, 0, 0, 0],
-        [1, 1, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 1, 0, 1],
-        [0, 0, 0, 0, 1, 0, 1, 0],
-        [0, 0, 0, 0, 0, 1, 0, 1],
-        [0, 0, 0, 0, 1, 0, 1, 0]
-    ]
-    """
-    begin = time.time()
-    func(graph)
-    time.sleep(1)
-    end = time.time()
-    return end - begin
 
 
 def find_bridges(graph: list[list[int]]) -> list:
@@ -486,6 +458,9 @@ def find_bridges(graph: list[list[int]]) -> list:
     return bridges
 
 
+
+
+
 def argprs():
     """
     Parse command-line arguments for the graph analysis library.
@@ -534,7 +509,6 @@ def argprs():
 
     return parser.parse_args()
 
-
 def main():
     """
     Control the execution of functions using argparse and output result.
@@ -553,7 +527,8 @@ def main():
 
     elif args.task == "write":
         print(f"Writing graph to {args.output}...")
-        write_graph_to_file(graph, args.output)
+        vertices = sorted(list({v for edge in graph for v in edge}))
+        write_graph_to_file(graph, args.output, vertices)
 
     elif args.task == "components":
         print("Finding connectivity components...")
@@ -575,9 +550,35 @@ def main():
         bridges = find_bridges(graph)
         print("Bridges:", bridges)
 
+def find_function_runtime(func, graph: list[list[int]]) -> float:
+    """
+    Returns the runtime of the function
+
+    :param func: callable, The function to check
+    :param graph: list, The graph that function will work with
+    :return: float, The runtime of the function
+
+    Example of matrix to test functions on:
+    matrix = [
+        [0, 1, 1, 1, 0, 0, 0, 0],
+        [1, 0, 1, 0, 1, 0, 0, 0],
+        [1, 1, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 1, 0, 1, 0]
+    ]
+    """
+    begin = time.time()
+    func(graph)
+    time.sleep(1)
+    end = time.time()
+    return end - begin
+
+
 
 if __name__ == "__main__":
-    # import doctest
-
-    # print(doctest.testmod())
+    import doctest
+    print(doctest.testmod())
     main()
