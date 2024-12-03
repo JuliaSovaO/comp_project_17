@@ -60,8 +60,10 @@ def read_graph(filename: str, is_directed: bool = False) -> list[list[int]]:
 
     return matrix
 
+
 def write_graph_to_file(
-    matrix: list[list[int]], filename: str,vertices: list, is_directed: bool = False):
+    matrix: list[list[int]], filename: str, vertices: list, is_directed: bool = False
+):
     """
     Writes a graph from matrix to a text file
 
@@ -99,7 +101,6 @@ def write_graph_to_file(
                         if edge not in written_edges:
                             file.write(f"{edge[0]},{edge[1]}\n")
                             written_edges.add(edge)
-
 
 
 def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sychak
@@ -174,7 +175,6 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
     visited = [False] * len(graph)
     components = []
 
-
     def dfs(node, component):
         visited[node] = True
         component.append(node)
@@ -194,9 +194,6 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
     return components
 
 
-
-
-
 def find_strong_connectivity_kosaraju(graph):
     """
     Знаходить компоненти сильної зв'язності у графі
@@ -207,6 +204,7 @@ def find_strong_connectivity_kosaraju(graph):
 [1, 0, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
     [[0, 1, 2], [3, 4]]
     """
+
     def transp_graph(graph):
         """
         Створює транспонований граф (змінює напрямки всіх ребер)
@@ -225,7 +223,6 @@ def find_strong_connectivity_kosaraju(graph):
                     transp[num2][num1] = 1
         return transp
 
-
     def dfs_kosaraju(graph, vert, visited, stack):
         """
         Перший прохід DFS для алгоритму Косараджу
@@ -242,7 +239,6 @@ def find_strong_connectivity_kosaraju(graph):
                 dfs_kosaraju(graph, vert1, visited, stack)
 
         stack.append(vert)
-
 
     vertices = len(graph)
     visited = [False] * vertices
@@ -262,11 +258,6 @@ def find_strong_connectivity_kosaraju(graph):
             dfs_kosaraju(transp, vert, visited, curr_comp)
             comps.append(sorted(curr_comp))
     return sorted(comps)
-
-
-
-
-
 
 
 def find_connection_points(graph: list[list[int]]) -> set:
@@ -310,6 +301,7 @@ def find_connection_points(graph: list[list[int]]) -> set:
         if new_components_of_conectivity > original_components_of_conectivity:
             articulation_points.add(i + 1)
     return articulation_points
+
 
 def find_connection_points_optimized(graph: list[list[int]]) -> set:
     """
@@ -409,12 +401,10 @@ def find_connection_points_optimized(graph: list[list[int]]) -> set:
     return articulation_points
 
 
-
-
 def find_bridges(graph: list[list[int]]) -> list:
     """
     Finds all bridges in an undirected graph represented by an adjacency matrix.
-    A bridge is an edge that, when removed, increases the number of connected components \
+    A bridge is an edge that, when removed, increases the number of connected components 
     in the graph.
 
     Args:
@@ -461,7 +451,71 @@ def find_bridges(graph: list[list[int]]) -> list:
     return bridges
 
 
+def find_bridges_dfs(graph: list[list[int]]) -> list:
+    """
+    Finds all bridges in an undirected graph represented by an adjacency matrix using DFS.
+    A bridge is an edge that, when removed, increases the number of connected components
+    in the graph.
 
+    Args:
+        graph (list[list[int]]): Adjacency matrix representing the graph.
+
+    Returns:
+        list[tuple[int, int]]: A list of bridges, where each bridge is represented as a \
+        tuple of two integers (the endpoints of the edge).
+
+    Examples:
+    >>> matrix1 = [[0, 1, 0, 0, 0], [1, 0, 1, 1, 0], [0, 1, 0, 0, 0], [0, 1, 0, 0, 1], \
+[0, 0, 0, 1, 0]]
+    >>> find_bridges_dfs(matrix1)
+    [(1, 2), (2, 3), (2, 4), (4, 5)]
+    >>> matrix2 = [[0, 1, 1, 0, 0], [1, 0, 1, 0, 0], [1, 1, 0, 1, 0], [0, 0, 1, 0, 1], \
+[0, 0, 0, 1, 0]]
+    >>> find_bridges_dfs(matrix2)
+    [(3, 4), (4, 5)]
+    >>> matrix3 = [[0, 1, 1, 0, 0, 0], [1, 0, 1, 0, 0, 0], [1, 1, 0, 1, 0, 0], [0, 0, 1, 0, 1, 1], \
+[0, 0, 0, 1, 0, 1], [0, 0, 0, 1, 1, 0]]
+    >>> find_bridges_dfs(matrix3)
+    [(3, 4)]
+    >>> matrix4 = [[0, 1, 0, 0, 1], [1, 0, 1, 0, 0], [0, 1, 0, 1, 0], [0, 0, 1, 0, 1], \
+[1, 0, 0, 1, 0]]
+    >>> find_bridges_dfs(matrix4)
+    []
+    >>> matrix5 = [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
+    >>> find_bridges_dfs(matrix5)
+    [(1, 2), (2, 3)]
+    """
+    n = len(graph)
+    bridges = []
+    visited = [False] * n
+    discovery = [-1] * n
+    low = [-1] * n
+    parent = [-1] * n
+    tme = [0]
+
+    def dfs(u: int):
+        visited[u] = True
+        discovery[u] = low[u] = tme[0]
+        tme[0] += 1
+
+        for v in range(n):
+            if graph[u][v] == 1:
+                if not visited[v]:
+                    parent[v] = u
+                    dfs(v)
+                    low[u] = min(low[u], low[v])
+                    if low[v] > discovery[u]:
+                        bridges.append((u + 1, v + 1))
+                elif v != parent[u]:
+                    low[u] = min(low[u], discovery[v])
+
+    for i in range(n):
+        if not visited[i]:
+            dfs(i)
+
+    bridges = sorted(bridges)
+
+    return bridges
 
 
 def argprs():
@@ -512,6 +566,7 @@ def argprs():
 
     return parser.parse_args()
 
+
 def main():
     """
     Control the execution of functions using argparse and output result.
@@ -550,8 +605,9 @@ def main():
 
     elif args.task == "bridges":
         print("Finding bridges...")
-        bridges = find_bridges(graph)
+        bridges = find_bridges_dfs(graph)
         print("Bridges:", bridges)
+
 
 def find_function_runtime(func, graph: list[list[int]]) -> float:
     """
@@ -580,8 +636,8 @@ def find_function_runtime(func, graph: list[list[int]]) -> float:
     return end - begin
 
 
-
 if __name__ == "__main__":
-    import doctest
-    print(doctest.testmod())
+    # import doctest
+
+    # print(doctest.testmod())
     main()
