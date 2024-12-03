@@ -196,10 +196,10 @@ def find_connectivity(graph: list[list[int]]) -> list[list[int]]:  # Sofiia Sych
 
 def find_strong_connectivity_kosaraju(graph):
     """
-    Знаходить компоненти сильної зв'язності у графі
-    Повертає список компонент, де кожна компонента - це список вершин
-    :param graph: граф у вигялді матриці
-    :return: список компонент сильної зв'язності
+    Finds strong connectivity in a graph
+    Returns a list of components
+    :param graph: matrix graph
+    :return: list of lists, where sublists are strong components
     >>> find_strong_connectivity_kosaraju([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], \
 [1, 0, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
     [[0, 1, 2], [3, 4]]
@@ -207,9 +207,9 @@ def find_strong_connectivity_kosaraju(graph):
 
     def transp_graph(graph):
         """
-        Створює транспонований граф (змінює напрямки всіх ребер)
-        :param graph: граф
-        :return: транспонований граф
+        Makes a transposed graph (all edges' directions are reversed)
+        :param graph: graph
+        :return: transposed graph
         >>> transpose_graph([[0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [1, 0, 0, 0, 0], \
     [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]])
         [[0, 0, 1, 0, 0], [1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1], [0, 0, 0, 1, 0]]
@@ -225,12 +225,12 @@ def find_strong_connectivity_kosaraju(graph):
 
     def dfs_kosaraju(graph, vert, visited, stack):
         """
-        Перший прохід DFS для алгоритму Косараджу
-        Заповнює стек у порядку завершення обходу
-        :param graph: граф у вигляді матриці
-        :param vert: вершина
-        :param visited: список вершин, які були пройдені
-        :param stack: стек, у який записуються вершини
+        Deep first search
+        Fills stack in the reversed order of passing vertices
+        :param graph: graph
+        :param vert: vertice
+        :param visited: list of visited vertices
+        :param stack: stack, in which the vertices are visited
         """
         visited[vert] = True
 
