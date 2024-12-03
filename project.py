@@ -585,8 +585,7 @@ def main():
 
     elif args.task == "write":
         print(f"Writing graph to {args.output}...")
-        vertices = sorted(list({v for edge in graph for v in edge}))
-        write_graph_to_file(graph, args.output, vertices)
+        write_graph_to_file(graph, args.output, list(range(1, len(graph) + 1)))
 
     elif args.task == "components":
         print("Finding connectivity components...")
@@ -638,6 +637,5 @@ def find_function_runtime(func, graph: list[list[int]]) -> float:
 
 if __name__ == "__main__":
     # import doctest
-
     # print(doctest.testmod())
     main()
